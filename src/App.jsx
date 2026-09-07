@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 //screens
 import Splash from "./screens/Splash";
 import Auth from "./screens/Auth";
-import Dashboard from "./screens/Dahboard";
+import Dashboard from "./screens/Dashboard";
 import Navbar from "./screens/Navbar";
 import Log from "./screens/Log";
 import Inventory from "./screens/Inventory";
