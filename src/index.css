@@ -472,7 +472,7 @@ body {
   padding: 20px;
   padding-bottom: 100px;
 }
-/* Settongs */
+/* Settings */
 
 .lock-card {
   margin-top: 16px;
@@ -562,4 +562,448 @@ body {
 .onboarding-card .google-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+.selected {
+  border: 3px solid var(--emerald-500);
+}
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.summary-row.net-profit {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+  margin-top: 4px;
+  font-weight: 600;
+  font-size: 16px;
+}
+.ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+
+.rank-number {
+  font-weight: 700;
+  opacity: 0.6;
+  width: 24px;
+}
+
+.rank-name {
+  flex: 1;
+}
+
+.rank-qty {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.trend-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.trend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trend-label {
+  width: 36px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.trend-bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.trend-bar-positive {
+  height: 100%;
+  background: #10b981;
+  border-radius: 4px;
+}
+
+.trend-bar-negative {
+  height: 100%;
+  background: #ef4444;
+  border-radius: 4px;
+}
+
+.trend-value {
+  width: 90px;
+  text-align: right;
+  font-size: 12px;
+}
+.upgrade-panel {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plan-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.notify-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.notify-hint {
+  font-size: 13px;
+  opacity: 0.7;
+  margin: 0;
+}
+
+.notify-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.notify-btn.whatsapp {
+  background: #25d366;
+  color: #062;
+}
+
+.notify-btn.sms {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.notify-btn.call {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.set-item-sub {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-left: 8px;
+}
+
+.business-edit-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.business-edit-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.faq-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.faq-item {
+  padding: 12px 16px;
+}
+
+.faq-question {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.faq-answer {
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+/* Inputs */
+.name-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  width: 93%;
+}
+
+.name-input:focus {
+  border-color: #10b981;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.name-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Generic buttons inside set-items (Edit / Save) */
+.set-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.name-item button,
+.business-edit-actions button {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.name-input1 {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  width: 65%;
+}
+.name-item button:hover,
+.business-edit-actions button:hover {
+  background: rgba(16, 185, 129, 0.25);
+}
+
+.name-item button:disabled,
+.business-edit-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Upgrade to Premium button */
+.upgrade-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.upgrade-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* Cancel button (already added, refining here) */
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 4px;
+}
+.avatar-img1 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.signout-btn {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.signout-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+}
+.product-limit-note {
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.6;
+  margin: 12px 0;
+}
+
+.limit-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.delete-btn {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+}
+
+.fab:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.expiry-note {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 1000;
+  animation: toast-in 0.2s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.toast-success {
+  background: #10b981;
+  color: #fff;
+}
+
+.toast-error {
+  background: #ef4444;
+  color: #fff;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+.tx-time {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-top: 2px;
+}
+.sort-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.sort-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sort-select {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 6px 32px 6px 12px;
+  font-size: 13px;
+  color: #fff;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%23ffffff' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.sort-select option {
+  background: #1a2e28;
+  color: #fff;
+  border-radius: 10px;
+}
+.date-wrap {
+  margin-top: 10px;
+  padding-left: 10px;
+  padding-top: 6px;
+}
+
+.date-input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  flex: 1;
+  font-family: inherit;
+  padding: 6px;
+  
+}
+.renew-banner {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 10px;
 }

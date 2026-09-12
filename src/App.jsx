@@ -10,11 +10,11 @@ import Navbar from "./screens/Navbar";
 import Log from "./screens/Log";
 import Inventory from "./screens/Inventory";
 import Analytics from "./screens/Analytics";
-import Settings from "./Settings";
+import Settings from "./screens/Settings";
 
 function App() {
-  const [screen, setScreen] = useState('splash');
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [screen, setScreen] = useState("splash");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [session, setSession] = useState(null);
   const [checkingSession, setCheckingSession] = useState(true);
 
@@ -24,9 +24,11 @@ function App() {
       setCheckingSession(false);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
+        setSession(newSession);
+      },
+    );
 
     return () => listener.subscription.unsubscribe();
   }, []);
@@ -35,47 +37,57 @@ function App() {
     if (checkingSession) return;
 
     if (session) {
-      setScreen('app');
+      setScreen("app");
     } else {
+      const isReturning = localStorage.getItem("bizdash_returning_user");
       const timer = setTimeout(() => {
-        setScreen('onboarding');
+        setScreen(isReturning ? "auth" : "onboarding");
       }, 1800);
       return () => clearTimeout(timer);
     }
   }, [checkingSession, session]);
+
   useEffect(() => {
-  if (!session) return;
+    if (!session) return;
 
-  const saved = localStorage.getItem("bizdash_onboarding");
-  if (!saved) return;
+    const saved = localStorage.getItem("bizdash_onboarding");
+    if (!saved) return;
 
-  const answers = JSON.parse(saved);
+    const answers = JSON.parse(saved);
 
-  supabase
-    .from("businesses")
-    .insert({
-      user_id: session.user.id,
-      name: answers.businessName,
-      business_type: answers.businessType
-    })
-    .then(({ error }) => {
-      if (!error) localStorage.removeItem("bizdash_onboarding");
-    });
-}, [session]);
+supabase
+  .from("businesses")
+  .insert({
+    user_id: session.user.id,
+    name: answers.businessName,
+    business_type: answers.businessType,
+    owner_name: session.user.email.split("@")[0],
+  })
+  .then(({ error }) => {
+    if (!error) localStorage.removeItem("bizdash_onboarding");
+  });
+  }, [session]);
 
   return (
     <div className="app-shell">
-      {screen === 'splash' && <Splash />}
-      {screen === 'onboarding' && <Onboarding onDone={() => setScreen('auth')} />}
-      {screen === 'auth' && <Auth />}
+      {screen === "splash" && <Splash />}
+      {screen === "onboarding" && (
+        <Onboarding
+          onDone={() => {
+            localStorage.setItem("bizdash_returning_user", "true");
+            setScreen("auth");
+          }}
+        />
+      )}
+      {screen === "auth" && <Auth />}
 
-      {screen === 'app' && (
+      {screen === "app" && (
         <>
-          {activeTab === 'dashboard' && <Dashboard />}
-          {activeTab === 'log' && <Log />}
-          {activeTab === 'inventory' && <Inventory />}
-          {activeTab === 'analytics' && <Analytics />}
-          {activeTab === 'settings' && <Settings />}
+          {activeTab === "dashboard" && <Dashboard />}
+          {activeTab === "log" && <Log />}
+          {activeTab === "inventory" && <Inventory />}
+          {activeTab === "analytics" && <Analytics />}
+          {activeTab === "settings" && <Settings />}
 
           <Navbar activeScreen={activeTab} onNavigate={setActiveTab} />
         </>

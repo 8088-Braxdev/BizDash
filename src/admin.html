@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BizDash Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #0d1b16;
+            --card: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text: #f4f6f5;
+            --muted: rgba(244, 246, 245, 0.6);
+            --accent: #3ddc97;
+            --danger: #e2574c;
+            --radius: 14px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 24px;
+        }
+
+        .wrap { max-width: 720px; margin: 0 auto; }
+
+        h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+        .subhead { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
+
+        #login-view { max-width: 300px; margin: 120px auto; text-align: center; }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        input:focus { outline: none; border-color: var(--accent); }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            background: var(--accent);
+            color: #06231a;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        #admin-view { display: none; }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .signout-link {
+            background: none;
+            color: var(--muted);
+            font-size: 13px;
+            text-decoration: underline;
+            padding: 0;
+        }
+
+        .biz-card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            margin-bottom: 12px;
+        }
+
+        .biz-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .biz-name { font-size: 16px; font-weight: 600; }
+        .biz-owner { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .badge-premium { background: rgba(61, 220, 151, 0.15); color: var(--accent); }
+        .badge-free { background: rgba(255, 255, 255, 0.08); color: var(--muted); }
+        .badge-expired { background: rgba(226, 87, 76, 0.15); color: var(--danger); }
+
+        .expiry-line { font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+        .actions { display: flex; gap: 8px; margin-top: 12px; }
+
+        .btn-extend {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-extend:hover { background: rgba(255, 255, 255, 0.1); }
+        .btn-extend:disabled { opacity: 0.5; cursor: default; }
+
+        .empty-state, .loading-state {
+            color: var(--muted);
+            font-size: 14px;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            background: var(--accent);
+            color: #06231a;
+            display: none;
+        }
+
+        .toast.error { background: var(--danger); color: #fff; }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrap">
+
+        <div id="login-view">
+            <h1>BizDash Admin</h1>
+            <input type="password" id="login-password" placeholder="Password" autocomplete="off" />
+            <button class="btn-primary" id="login-btn">Enter</button>
+            <div class="error-msg" id="login-error">Wrong password.</div>
+        </div>
+
+        <div id="admin-view">
+            <div class="topbar">
+                <div>
+                    <h1>Businesses</h1>
+                    <p class="subhead" style="margin:0;">All BizDash accounts</p>
+                </div>
+                <button class="signout-link" id="signout-btn">Lock</button>
+            </div>
+            <div id="biz-list"></div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+    </div>
+
+    <script>
+        // ---- Your Supabase project ----
+        const SUPABASE_URL = "https://jkymsgtbqwinystowmlh.supabase.co";
+        // service_role key — bypasses RLS entirely. This file is for YOUR eyes only,
+        // never share it, never upload it anywhere public.
+        const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpreW1zZ3RicXdpbnlzdG93bWxoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjM5MDgzMywiZXhwIjoyMDg3OTY2ODMzfQ._9iBd3Y4fVhbKqmKYYfqZugLPiOJtVYS_d8b9WyAhMU";
+
+        // Change this to whatever you want your password to be
+        const ADMIN_PASSWORD = "8088";
+        // ----------------------------------------------------
+
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+        const loginView = document.getElementById("login-view");
+        const adminView = document.getElementById("admin-view");
+        const bizList = document.getElementById("biz-list");
+        const toastEl = document.getElementById("toast");
+        const errorEl = document.getElementById("login-error");
+
+        function showToast(message, isError) {
+            toastEl.textContent = message;
+            toastEl.className = "toast" + (isError ? " error" : "");
+            toastEl.style.display = "block";
+            setTimeout(() => { toastEl.style.display = "none"; }, 3000);
+        }
+
+        function formatDate(iso) {
+            if (!iso) return "—";
+            const d = new Date(iso);
+            return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+        }
+
+        function daysLeft(iso) {
+            if (!iso) return null;
+            return Math.ceil((new Date(iso) - new Date()) / (1000 * 60 * 60 * 24));
+        }
+
+        document.getElementById("login-btn").addEventListener("click", () => {
+            const entered = document.getElementById("login-password").value;
+            if (entered === ADMIN_PASSWORD) {
+                errorEl.style.display = "none";
+                loginView.style.display = "none";
+                adminView.style.display = "block";
+                loadBusinesses();
+            } else {
+                errorEl.style.display = "block";
+            }
+        });
+
+        document.getElementById("login-password").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") document.getElementById("login-btn").click();
+        });
+
+        document.getElementById("signout-btn").addEventListener("click", () => {
+            adminView.style.display = "none";
+            loginView.style.display = "block";
+            document.getElementById("login-password").value = "";
+        });
+
+        async function loadBusinesses() {
+            bizList.innerHTML = '<div class="loading-state">Loading businesses...</div>';
+
+            const { data, error } = await supabaseClient
+                .from("businesses")
+                .select("*")
+                .order("name", { ascending: true });
+
+            if (error) {
+bizList.innerHTML = '<div class="empty-state">Error: ' + escapeHtml(error.message || JSON.stringify(error)) + '</div>';
+                console.error(error);
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                bizList.innerHTML = '<div class="empty-state">No businesses yet.</div>';
+                return;
+            }
+
+            bizList.innerHTML = "";
+            data.forEach((biz) => renderBizCard(biz));
+        }
+
+        function renderBizCard(biz) {
+            const left = daysLeft(biz.premium_expires_at);
+            const isActive = biz.is_premium && left !== null && left > 0;
+
+            let badgeClass = "badge-free";
+            let badgeText = "Free tier";
+            if (isActive) {
+                badgeClass = "badge-premium";
+                badgeText = "Premium";
+            } else if (biz.premium_expires_at && left !== null && left <= 0) {
+                badgeClass = "badge-expired";
+                badgeText = "Expired";
+            }
+
+            const card = document.createElement("div");
+            card.className = "biz-card";
+            card.innerHTML = `
+      <div class="biz-top">
+        <div>
+          <div class="biz-name">${escapeHtml(biz.name || "Unnamed business")}</div>
+          <div class="biz-owner">${escapeHtml(biz.owner_name || "No owner name set")}</div>
+        </div>
+        <span class="badge ${badgeClass}">${badgeText}</span>
+      </div>
+      <div class="expiry-line">
+        ${biz.premium_expires_at ? "Expires " + formatDate(biz.premium_expires_at) : "No expiry set"}
+      </div>
+      <div class="actions">
+        <button class="btn-extend" data-days="30">+30 days</button>
+        <button class="btn-extend" data-days="90">+90 days</button>
+      </div>
+    `;
+
+            card.querySelectorAll(".btn-extend").forEach((btn) => {
+                btn.addEventListener("click", () => extendPremium(biz, parseInt(btn.dataset.days, 10), btn));
+            });
+
+            bizList.appendChild(card);
+        }
+
+        async function extendPremium(biz, days, btnEl) {
+            const buttons = btnEl.parentElement.querySelectorAll("button");
+            buttons.forEach((b) => (b.disabled = true));
+
+            const currentExpiry = biz.premium_expires_at ? new Date(biz.premium_expires_at) : null;
+            const base = currentExpiry && currentExpiry > new Date() ? currentExpiry : new Date();
+            base.setDate(base.getDate() + days);
+
+            const { error } = await supabaseClient
+                .from("businesses")
+                .update({ is_premium: true, premium_expires_at: base.toISOString() })
+                .eq("id", biz.id);
+
+            buttons.forEach((b) => (b.disabled = false));
+
+            if (error) {
+                console.error(error);
+                showToast("Couldn't extend — try again", true);
+                return;
+            }
+
+            showToast(biz.name + " extended by " + days + " days", false);
+            loadBusinesses();
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement("div");
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+
+</body>
+
+</html>
