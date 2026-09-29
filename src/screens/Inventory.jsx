@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useActiveBusiness } from '../hooks/useActiveBusiness';
+import { useProfile } from '../hooks/useProfile';
 
 const FREE_PRODUCT_LIMIT = 10;
 
 function Inventory() {
   const { business, loading: businessLoading } = useActiveBusiness();
+  const { profile, loading: profileLoading } = useProfile();
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(true);
-  const isLoading = businessLoading || productsLoading;
+  const isLoading = businessLoading || productsLoading || profileLoading;
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -18,11 +20,11 @@ function Inventory() {
   const [sortBy, setSortBy] = useState('name');
   const [toast, setToast] = useState(null); // { message, type: 'success' | 'error' }
 
-  const isPremium =
-    business &&
-    business.is_premium &&
-    business.premium_expires_at &&
-    new Date(business.premium_expires_at) > new Date();
+const isPremium =
+  profile &&
+  profile.is_premium &&
+  profile.premium_expires_at &&
+  new Date(profile.premium_expires_at) > new Date();
 
   const atLimit = !isPremium && products.length >= FREE_PRODUCT_LIMIT;
 
@@ -145,7 +147,7 @@ function Inventory() {
     setStock('');
   }
 
-  if (businessLoading) {
+  if (businessLoading || profileLoading) {
     return (
       <div className="inventory">
         <div className="topbar">

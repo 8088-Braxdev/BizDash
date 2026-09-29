@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
-import { useActiveBusiness } from "../hooks/useActiveBusiness";
+import { useAppData } from "../context/AppDataContext";
 import { formatTimestamp } from "../utils";
+import NotificationBell from "../components/NotificationBell";
 
 function Dashboard() {
-  const { business } = useActiveBusiness();
+  const { business, loading } = useAppData();
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [avatarUrl, setAvatarUrl] = useState("");
-  const [firstName, setFirstName] = useState("");
+  const firstName = business?.owner_name
+    ? business.owner_name.split(" ")[0]
+    : "";
   const [sortBy, setSortBy] = useState("newest");
 
   function getSortedTransactions() {
@@ -52,12 +55,6 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (business && business.owner_name) {
-      setFirstName(business.owner_name.split(" ")[0]);
-    }
-  }, [business]);
-
-  useEffect(() => {
     if (!business) return;
 
     async function loadTransactions() {
@@ -81,24 +78,41 @@ function Dashboard() {
 
     loadTransactions();
   }, [business]);
-
+  if (loading) {
+    return (
+      <div className="dashboard">
+        <div className="topbar">
+          <div className="biz-name">Dashboard</div>
+        </div>
+        <div className="empty-state">Loading...</div>
+      </div>
+    );
+  }
   return (
     <div className="dashboard">
       <div className="topbar">
-        <div>
-          <div className="greet">
-            Habari{firstName ? ", " + firstName : ""} 👋
+        <div className="topbar-left">
+          <div className="glass-card logo-chip">
+            <img src="/logo.png" alt="BizDash" />
           </div>
-          <div className="biz-name">
-            {business ? business.name : "Your Business"}
+          <div>
+            <div className="greet">
+              Habari{firstName ? ", " + firstName : ""} 👋
+            </div>
+            <div className="biz-name">
+              {business ? business.name : "Your Business"}
+            </div>
           </div>
         </div>
-        <div className="avatar">
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="Profile" className="avatar-img1" />
-          ) : (
-            "?"
-          )}
+        <div className="topbar-right">
+          <NotificationBell />
+          <div className="avatar">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Profile" className="avatar-img1" />
+            ) : (
+              "?"
+            )}
+          </div>
         </div>
       </div>
 
@@ -125,7 +139,11 @@ function Dashboard() {
       {isLoading && (
         <div className="empty-state">Loading your transactions...</div>
       )}
-
+      {!isLoading && transactions.length === 0 && (
+        <div className="empty-state">
+          No transactions yet today. Log a sale or expense to see it here.
+        </div>
+      )}
       {!isLoading && transactions.length > 0 && (
         <div className="sort-row">
           <span className="sort-label">Sort by</span>

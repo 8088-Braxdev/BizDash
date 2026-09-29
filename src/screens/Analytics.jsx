@@ -1,19 +1,21 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useActiveBusiness } from "../hooks/useActiveBusiness";
+import { useProfile } from "../hooks/useProfile";
 import { formatTimestamp } from "../utils";
 
 function Analytics() {
   const { business, loading } = useActiveBusiness();
+  const { profile, loading: profileLoading } = useProfile();
   const [weeklyData, setWeeklyData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState("newest");
 
   const isPremium =
-    business &&
-    business.is_premium &&
-    business.premium_expires_at &&
-    new Date(business.premium_expires_at) > new Date();
+    profile &&
+    profile.is_premium &&
+    profile.premium_expires_at &&
+    new Date(profile.premium_expires_at) > new Date();
 
   useEffect(() => {
     if (!business) return;
@@ -95,7 +97,7 @@ function Analytics() {
     return sorted; // "newest" needs no re-sort — Supabase already returns it that way
   }
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="analytics">
         <div className="topbar">

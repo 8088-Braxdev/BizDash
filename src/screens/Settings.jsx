@@ -38,7 +38,8 @@ const WHATSAPP_NUMBER = "255618811359";
 function Settings() {
   const { business, loading } = useActiveBusiness();
 
-  const [displayName, setDisplayName] = useState("");
+  const [displayName, setDisplayName] = useState(null);
+  const shownName = displayName ?? business?.owner_name ?? "";
   const [editingName, setEditingName] = useState(false);
   const [savingName, setSavingName] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -61,9 +62,13 @@ function Settings() {
     business.premium_expires_at &&
     new Date(business.premium_expires_at) > new Date();
 
-  const daysLeft = business && business.premium_expires_at
-    ? Math.ceil((new Date(business.premium_expires_at) - new Date()) / (1000 * 60 * 60 * 24))
-    : null;
+  const daysLeft =
+    business && business.premium_expires_at
+      ? Math.ceil(
+          (new Date(business.premium_expires_at) - new Date()) /
+            (1000 * 60 * 60 * 24),
+        )
+      : null;
 
   useEffect(() => {
     async function loadUser() {
@@ -85,14 +90,6 @@ function Settings() {
     loadUser();
   }, []);
 
-  useEffect(() => {
-    if (business) {
-      setBizName(business.name || "");
-      setBizType(business.business_type || "");
-      setDisplayName(business.owner_name || "");
-    }
-  }, [business]);
-
   function showToast(message, type) {
     setToast({ message: message, type: type });
     setTimeout(() => setToast(null), 3000);
@@ -106,7 +103,7 @@ function Settings() {
     setSavingName(true);
     const { error } = await supabase
       .from("businesses")
-      .update({ owner_name: displayName })
+      .update({ owner_name: shownName })
       .eq("id", business.id);
     setSavingName(false);
     if (error) {
@@ -133,7 +130,11 @@ function Settings() {
     setEditingBusiness(false);
     showToast("Business profile updated", "success");
   }
-
+  function openBusinessEdit() {
+    setBizName(business?.name || "");
+    setBizType(business?.business_type || "");
+    setEditingBusiness(true);
+  }
   function cancelUpgrade() {
     setSelectedPlan(null);
     setShowUpgrade(false);
@@ -193,7 +194,9 @@ function Settings() {
 
       <div className="glass-card plan-card">
         <div className="plan-label">Current plan</div>
-        <div className="plan-name">{isPremiumActive ? "Premium" : "Free tier"}</div>
+        <div className="plan-name">
+          {isPremiumActive ? "Premium" : "Free tier"}
+        </div>
 
         {isPremiumActive && daysLeft !== null && (
           <div className="expiry-note">
@@ -210,7 +213,10 @@ function Settings() {
         {!isPremiumActive && (
           <>
             {!showUpgrade && (
-              <button className="upgrade-btn" onClick={() => setShowUpgrade(true)}>
+              <button
+                className="upgrade-btn"
+                onClick={() => setShowUpgrade(true)}
+              >
                 Upgrade to Premium
               </button>
             )}
@@ -235,8 +241,13 @@ function Settings() {
 
                 {selectedPlan && (
                   <div className="notify-options">
-                    <p className="notify-hint">Pay via mobile money, then notify me:</p>
-                    <button className="notify-btn whatsapp" onClick={notifyWhatsApp}>
+                    <p className="notify-hint">
+                      Pay via mobile money, then notify me:
+                    </p>
+                    <button
+                      className="notify-btn whatsapp"
+                      onClick={notifyWhatsApp}
+                    >
                       I've Paid — WhatsApp
                     </button>
                     <button className="notify-btn sms" onClick={notifySMS}>
@@ -261,12 +272,14 @@ function Settings() {
         <h3>Profile</h3>
       </div>
       <div className="glass-card set-item name-item">
-        {avatarUrl && <img src={avatarUrl} alt="Profile" className="avatar-img" />}
+        {avatarUrl && (
+          <img src={avatarUrl} alt="Profile" className="avatar-img" />
+        )}
         {editingName ? (
           <>
             <input
               type="text"
-              value={displayName}
+              value={shownName}
               onChange={(e) => setDisplayName(e.target.value)}
               className="name-input1"
             />
@@ -276,7 +289,7 @@ function Settings() {
           </>
         ) : (
           <>
-            <span>{displayName || "Add your name"}</span>
+            <span>{shownName || "Add your name"}</span>
             <button onClick={() => setEditingName(true)}>Edit</button>
           </>
         )}
@@ -310,7 +323,10 @@ function Settings() {
             <button onClick={saveBusinessProfile} disabled={savingBiz}>
               {savingBiz ? "Saving..." : "Save"}
             </button>
-            <button className="cancel-btn" onClick={() => setEditingBusiness(false)}>
+            <button
+              className="cancel-btn"
+              onClick={() => setEditingBusiness(false)}
+            >
               Cancel
             </button>
           </div>
@@ -318,10 +334,12 @@ function Settings() {
       ) : (
         <div
           className="glass-card set-item clickable"
-          onClick={() => setEditingBusiness(true)}
+          onClick={openBusinessEdit}
         >
           <span>{business ? business.name : "Business profile"}</span>
-          <span className="set-item-sub">{business ? business.business_type : ""}</span>
+          <span className="set-item-sub">
+            {business ? business.business_type : ""}
+          </span>
         </div>
       )}
 
@@ -332,7 +350,10 @@ function Settings() {
       <div className="section-head">
         <h3>Support</h3>
       </div>
-      <div className="glass-card set-item clickable" onClick={chatSupportWhatsApp}>
+      <div
+        className="glass-card set-item clickable"
+        onClick={chatSupportWhatsApp}
+      >
         Chat with us on WhatsApp
       </div>
       <div
@@ -362,7 +383,9 @@ function Settings() {
         Sign out
       </button>
 
-      {toast && <div className={"toast toast-" + toast.type}>{toast.message}</div>}
+      {toast && (
+        <div className={"toast toast-" + toast.type}>{toast.message}</div>
+      )}
     </div>
   );
 }

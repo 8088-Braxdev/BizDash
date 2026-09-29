@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
+import { AppDataProvider } from "./context/AppDataContext";
 
 //screens
 import Splash from "./screens/Splash";
@@ -13,10 +14,11 @@ import Analytics from "./screens/Analytics";
 import Settings from "./screens/Settings";
 
 function App() {
-  const [screen, setScreen] = useState("splash");
+  const [flowScreen, setScreen] = useState("splash");
   const [activeTab, setActiveTab] = useState("dashboard");
   const [session, setSession] = useState(null);
   const [checkingSession, setCheckingSession] = useState(true);
+  const screen = session ? "app" : flowScreen;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -34,17 +36,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (checkingSession) return;
+    if (checkingSession || session) return;
 
-    if (session) {
-      setScreen("app");
-    } else {
-      const isReturning = localStorage.getItem("bizdash_returning_user");
-      const timer = setTimeout(() => {
-        setScreen(isReturning ? "auth" : "onboarding");
-      }, 1800);
-      return () => clearTimeout(timer);
-    }
+    const isReturning = localStorage.getItem("bizdash_returning_user");
+    const timer = setTimeout(() => {
+      setScreen(isReturning ? "auth" : "onboarding");
+    }, 1800);
+    return () => clearTimeout(timer);
   }, [checkingSession, session]);
 
   useEffect(() => {
@@ -55,17 +53,17 @@ function App() {
 
     const answers = JSON.parse(saved);
 
-supabase
-  .from("businesses")
-  .insert({
-    user_id: session.user.id,
-    name: answers.businessName,
-    business_type: answers.businessType,
-    owner_name: session.user.email.split("@")[0],
-  })
-  .then(({ error }) => {
-    if (!error) localStorage.removeItem("bizdash_onboarding");
-  });
+    supabase
+      .from("businesses")
+      .insert({
+        user_id: session.user.id,
+        name: answers.businessName,
+        business_type: answers.businessType,
+        owner_name: session.user.email.split("@")[0],
+      })
+      .then(({ error }) => {
+        if (!error) localStorage.removeItem("bizdash_onboarding");
+      });
   }, [session]);
 
   return (
@@ -82,7 +80,7 @@ supabase
       {screen === "auth" && <Auth />}
 
       {screen === "app" && (
-        <>
+        <AppDataProvider session={session}>
           {activeTab === "dashboard" && <Dashboard />}
           {activeTab === "log" && <Log />}
           {activeTab === "inventory" && <Inventory />}
@@ -90,7 +88,7 @@ supabase
           {activeTab === "settings" && <Settings />}
 
           <Navbar activeScreen={activeTab} onNavigate={setActiveTab} />
-        </>
+        </AppDataProvider>
       )}
     </div>
   );
