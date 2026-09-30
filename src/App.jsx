@@ -38,7 +38,10 @@ function App() {
   useEffect(() => {
     if (checkingSession || session) return;
 
-    const isReturning = localStorage.getItem("bizdash_returning_user");
+    const wantsLogin =
+      new URLSearchParams(window.location.search).get("login") === "1";
+    const isReturning =
+      wantsLogin || localStorage.getItem("bizdash_returning_user");
     const timer = setTimeout(() => {
       setScreen(isReturning ? "auth" : "onboarding");
     }, 1800);
@@ -53,17 +56,30 @@ function App() {
 
     const answers = JSON.parse(saved);
 
-    supabase
-      .from("businesses")
-      .insert({
+    async function createBusinessIfMissing() {
+      const { data: existing } = await supabase
+        .from("businesses")
+        .select("id")
+        .eq("user_id", session.user.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (existing) {
+        localStorage.removeItem("bizdash_onboarding");
+        return;
+      }
+
+      const { error } = await supabase.from("businesses").insert({
         user_id: session.user.id,
         name: answers.businessName,
         business_type: answers.businessType,
         owner_name: session.user.email.split("@")[0],
-      })
-      .then(({ error }) => {
-        if (!error) localStorage.removeItem("bizdash_onboarding");
       });
+
+      if (!error) localStorage.removeItem("bizdash_onboarding");
+    }
+
+    createBusinessIfMissing();
   }, [session]);
 
   return (

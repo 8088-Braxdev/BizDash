@@ -1558,3 +1558,24 @@ body {
 .bell-panel .notif-item.new .notif-msg {
   font-weight: 700;
 }
+.bell-wrap {
+  position: static;
+}
+
+.bell-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  width: auto;
+  max-width: 340px;
+  margin-left: auto;
+}
+.set-item.danger {
+  color: #ef6b64;
+  margin-top: 16px;
+}
+
+.set-item.danger::after {
+  color: #ef6b64;
+}

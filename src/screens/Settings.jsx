@@ -166,7 +166,18 @@ function Settings() {
   function notifyCall() {
     window.location.href = "tel:" + WHATSAPP_NUMBER;
   }
+  function requestAccountDeletion() {
+    const ok = window.confirm(
+      "Ask us to permanently delete your account and all your business data?",
+    );
+    if (!ok) return;
 
+    const name = business ? business.name : "my business";
+    const text = encodeURIComponent(
+      'Hi Braxton, please delete my BizDash account and all my data. Business: "' + name + '".',
+    );
+    window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + text, "_blank");
+  }
   function chatSupportWhatsApp() {
     const name = business ? business.name : "my business";
     const text = encodeURIComponent(
@@ -378,7 +389,12 @@ function Settings() {
           ))}
         </div>
       )}
-
+      <div
+        className="glass-card set-item clickable danger"
+        onClick={requestAccountDeletion}
+      >
+        Delete my account
+      </div>
       <button className="signout-btn" onClick={signOut}>
         Sign out
       </button>
