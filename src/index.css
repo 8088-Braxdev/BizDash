@@ -1579,3 +1579,80 @@ body {
 .set-item.danger::after {
   color: #ef6b64;
 }
+/* ===== FIX 1: no white flash on fast scroll ===== */
+html {
+  background-color: #06140e;
+  color-scheme: dark;
+  overscroll-behavior-y: none;
+}
+
+body {
+  background: transparent;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(52, 214, 127, 0.2), transparent 45%),
+    linear-gradient(160deg, var(--emerald-950), var(--emerald-900));
+}
+
+/* ===== FIX 2: popup above the tab bar ===== */
+.dashboard,
+.log,
+.inventory,
+.settings,
+.analytics {
+  animation: fade-in 0.3s ease-out;
+}
+
+.navbar {
+  z-index: 50;
+}
+
+.fab {
+  z-index: 20;
+}
+
+.modal-overlay {
+  z-index: 1000;
+}
+
+.modal-card {
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+
+/* ===== FIX 3: Settings name row on phones ===== */
+.name-item {
+  gap: 10px;
+}
+
+.name-item .avatar-img {
+  margin-right: 0;
+  flex-shrink: 0;
+}
+
+.name-item span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.name-input1 {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+
+.name-item button {
+  flex-shrink: 0;
+}
+
+.name-input {
+  width: 100%;
+}

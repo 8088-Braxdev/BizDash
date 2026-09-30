@@ -32,7 +32,8 @@ const FAQS = [
     a: "As soon as your payment is matched, usually within a few hours.",
   },
 ];
-
+const PAY_NUMBER = "HALOPESA 255618811359";
+const PAY_NAME = "VENANCE TILLYA"; 
 const WHATSAPP_NUMBER = "255618811359";
 
 function Settings() {
@@ -252,8 +253,8 @@ function Settings() {
 
                 {selectedPlan && (
                   <div className="notify-options">
-                    <p className="notify-hint">
-                      Pay via mobile money, then notify me:
+                                   <p className="notify-hint">
+                      Send TZS {selectedPlan.price} to <strong>{PAY_NUMBER}</strong> ({PAY_NAME}), then notify me:
                     </p>
                     <button
                       className="notify-btn whatsapp"

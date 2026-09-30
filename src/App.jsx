@@ -48,6 +48,13 @@ function App() {
     return () => clearTimeout(timer);
   }, [checkingSession, session]);
 
+    useEffect(() => {
+    if (session) {
+      document.cookie =
+        "bizdash_member=1; domain=.braxcode.com; path=/; max-age=31536000; SameSite=Lax; Secure";
+    }
+  }, [session]);
+
   useEffect(() => {
     if (!session) return;
 
@@ -73,10 +80,15 @@ function App() {
         user_id: session.user.id,
         name: answers.businessName,
         business_type: answers.businessType,
-        owner_name: session.user.email.split("@")[0],
+                owner_name:
+          session.user.user_metadata?.full_name ||
+          session.user.user_metadata?.name ||
+          session.user.email.split("@")[0],
       });
 
-      if (!error) localStorage.removeItem("bizdash_onboarding");
+        if (!error || error.code === "23505") {
+        localStorage.removeItem("bizdash_onboarding");
+      }
     }
 
     createBusinessIfMissing();
