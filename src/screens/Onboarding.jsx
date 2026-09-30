@@ -1,27 +1,38 @@
 import { useState } from "react";
-
-const BUSINESS_TYPES = ["Retail", "Food & Drinks", "Salon & Beauty", "Services", "Other"];
+import { BUSINESS_TYPES } from "../businessTypes";
 
 function Onboarding({ onDone }) {
+  const [ownerName, setOwnerName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [businessType, setBusinessType] = useState("");
 
   function handleContinue() {
     const answers = {
-      businessName: businessName,
-      businessType: businessType
+      ownerName: ownerName.trim(),
+      businessName: businessName.trim(),
+      businessType: businessType,
     };
     localStorage.setItem("bizdash_onboarding", JSON.stringify(answers));
     onDone();
   }
 
-  const canContinue = businessName.trim() !== "" && businessType !== "";
+  const canContinue =
+    ownerName.trim() !== "" &&
+    businessName.trim() !== "" &&
+    businessType !== "";
 
   return (
     <div className="onboarding">
       <div className="glass-card onboarding-card">
         <h2>Let's set up your business</h2>
-
+        <input
+          type="text"
+          placeholder="Your name"
+          autoComplete="name"
+          value={ownerName}
+          onChange={(e) => setOwnerName(e.target.value)}
+        />
+        <p className="onboarding-hint">You can change this later in Settings.</p>
         <input
           type="text"
           placeholder="Business name"

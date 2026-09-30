@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
-import { useActiveBusiness } from "../hooks/useActiveBusiness";
+import {useAppData} from "../context/AppDataContext";
+import { BUSINESS_TYPES } from "../businessTypes";
 
 const PLANS = [
   { id: "monthly", label: "1 Month", price: 5000 },
@@ -9,14 +10,6 @@ const PLANS = [
   { id: "annual", label: "1 Year", price: 42000 },
 ];
 
-const BUSINESS_TYPES = [
-  "Retail Shop",
-  "Restaurant/Food",
-  "Salon/Beauty",
-  "Electronics",
-  "Services",
-  "Other",
-];
 
 const FAQS = [
   {
@@ -33,11 +26,11 @@ const FAQS = [
   },
 ];
 const PAY_NUMBER = "HALOPESA 255618811359";
-const PAY_NAME = "VENANCE TILLYA"; 
+const PAY_NAME = "VENANCE TILLYA";
 const WHATSAPP_NUMBER = "255618811359";
 
 function Settings() {
-  const { business, loading } = useActiveBusiness();
+  const { business, loading, refreshBusiness } = useAppData();
 
   const [displayName, setDisplayName] = useState(null);
   const shownName = displayName ?? business?.owner_name ?? "";
@@ -112,6 +105,7 @@ function Settings() {
       showToast("Couldn't save name — try again", "error");
       return;
     }
+    await refreshBusiness();
     setEditingName(false);
     showToast("Name saved", "success");
   }
@@ -128,6 +122,7 @@ function Settings() {
       showToast("Couldn't save business profile — try again", "error");
       return;
     }
+    await refreshBusiness();
     setEditingBusiness(false);
     showToast("Business profile updated", "success");
   }
@@ -175,7 +170,9 @@ function Settings() {
 
     const name = business ? business.name : "my business";
     const text = encodeURIComponent(
-      'Hi Braxton, please delete my BizDash account and all my data. Business: "' + name + '".',
+      'Hi Braxton, please delete my BizDash account and all my data. Business: "' +
+        name +
+        '".',
     );
     window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + text, "_blank");
   }
@@ -253,8 +250,10 @@ function Settings() {
 
                 {selectedPlan && (
                   <div className="notify-options">
-                                   <p className="notify-hint">
-                      Send TZS {selectedPlan.price} to <strong>{PAY_NUMBER}</strong> ({PAY_NAME}), then notify me:
+                    <p className="notify-hint">
+                      Send TZS {selectedPlan.price} to{" "}
+                      <strong>{PAY_NUMBER}</strong> ({PAY_NAME}), then notify
+                      me:
                     </p>
                     <button
                       className="notify-btn whatsapp"

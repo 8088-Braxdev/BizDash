@@ -125,8 +125,16 @@ const isPremium =
     closeForm();
   }
 
-  async function handleDeleteProduct() {
-    const { error } = await supabase.from('products').delete().eq('id', editingId);
+  async function handleDeleteProduct(product) {
+    const ok = window.confirm(
+      'Delete "' + product.name + '"? This cannot be undone.',
+    );
+    if (!ok) return;
+
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', product.id);
 
     if (error) {
       console.error(error);
@@ -134,9 +142,8 @@ const isPremium =
       return;
     }
 
-    setProducts(products.filter((p) => p.id !== editingId));
+    setProducts(products.filter((p) => p.id !== product.id));
     showToast('Product deleted', 'success');
-    closeForm();
   }
 
   function closeForm() {
@@ -190,11 +197,22 @@ const isPremium =
       )}
 
       {sortedProducts.map((p) => (
-        <div key={p.id} className="glass-card inv-item clickable" onClick={() => openEditForm(p)}>
-          <div>
+        <div key={p.id} className="glass-card inv-item">
+          <div className="inv-main">
             <div className="inv-name">{p.name}</div>
             <div className={p.stock <= 5 ? 'inv-stock low' : 'inv-stock ok'}>
               {p.stock <= 5 ? p.stock + ' left — low stock' : p.stock + ' in stock'}
+            </div>
+            <div className="inv-actions">
+              <button className="inv-btn" onClick={() => openEditForm(p)}>
+                Edit
+              </button>
+              <button
+                className="inv-btn danger"
+                onClick={() => handleDeleteProduct(p)}
+              >
+                Delete
+              </button>
             </div>
           </div>
           <div className="inv-price">{p.price}</div>
@@ -257,11 +275,7 @@ const isPremium =
               {editingId ? 'Save changes' : 'Save product'}
             </button>
 
-            {editingId && (
-              <button className="delete-btn" onClick={handleDeleteProduct}>
-                Delete product
-              </button>
-            )}
+
           </div>
         </div>
       )}

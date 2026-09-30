@@ -97,7 +97,7 @@ function Dashboard() {
           </div>
           <div>
             <div className="greet">
-              Habari{firstName ? ", " + firstName : ""} 👋
+              Hi{firstName ? ", " + firstName : ""} 👋
             </div>
             <div className="biz-name">
               {business ? business.name : "Your Business"}
